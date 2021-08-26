@@ -30,6 +30,7 @@ class BoardController:
 			elif player == 2:
 				self.board.put_piece(row, col, Piece.YELLOW)
 
+
 	def valid_position(self, col):
 		bp = self.board.get_position(0, col)
 		if bp.get_piece_color() == Piece.BLACK.value:
@@ -43,7 +44,16 @@ class BoardController:
 			if bp.get_piece_color() == Piece.BLACK.value:
 				return r
 
-	def winning_move(self, last_move):
+	def check_draw(self):
+		board_values = self.board.get_board_values()
+		for c in range(self.cols):
+			col_used = self.valid_position(c)
+			if col_used == True:
+				return False
+		return True
+
+
+	def check_winner(self, last_move):
 
 		for ind_r, r in enumerate(self.board.get_board_values()):
 			for ind_c, c in enumerate(r):

@@ -1,0 +1,13 @@
+web outline text
+https://www.pygame.org/pcr/hollow_outline/index.php
+
+wait while runing code
+https://stackoverflow.com/questions/18839039/how-to-wait-some-time-in-pygame
+
+tutorial + sprites for game
+https://realpython.com/pygame-a-primer/
+
+
+
+
+
