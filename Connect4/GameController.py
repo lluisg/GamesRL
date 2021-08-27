@@ -20,7 +20,7 @@ class GameController:
 		self.turn = -1
 
 		self.screen = pygame.display.set_mode(self.area)
-		pygame.display.set_caption('Box Test')
+		pygame.display.set_caption('Connect4')
 		self.clock = pygame.time.Clock()
 		self.clock.tick(60) # 60 FPS
 		self.cooldown = 1000

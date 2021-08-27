@@ -1,1 +1,1 @@
-# RL_connect4
+# Connect4
