@@ -23,7 +23,7 @@ class Player:
 		self.i_rows -= 1
 		self.i_cols -= 1
 		self.game = pygame
-		self.pos_piece = 0
+		self.pos_piece = 3
 		self.ui = ui
 
 	def move(self):
@@ -43,7 +43,7 @@ class Player:
 					if self.b_controller.valid_position(self.pos_piece):
 						self.ui.print_drop_piece(self.player, self.pos_piece)
 						self.b_controller.drop_piece(self.pos_piece, self.player)
-						self.pos_piece = 0
+						self.pos_piece = 3
 						return True
 					else:
 						self.ui.print_wrongdrop(self.player, self.pos_piece)

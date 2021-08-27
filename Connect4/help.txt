@@ -7,6 +7,29 @@ https://stackoverflow.com/questions/18839039/how-to-wait-some-time-in-pygame
 tutorial + sprites for game
 https://realpython.com/pygame-a-primer/
 
+------------------------------------------------------
+
+basarme en aquests:
+https://towardsdatascience.com/deep-q-network-with-pytorch-146bfa939dfe
+
+	altres exemples similars:
+https://towardsdatascience.com/deep-q-learning-tutorial-mindqn-2a4c855abffc
+
+https://towardsdatascience.com/deep-q-networks-theory-and-implementation-37543f60dd67	-> indica com fer video
+
+
+-----------------------------------------------------------
+
+snake ai
+https://github.com/python-engineer/snake-ai-pytorch
+
+rocket ai
+https://towardsdatascience.com/ultimate-guide-for-ai-game-creation-part-2-training-e252108dfbd1
+
+custom gym env
+https://stable-baselines.readthedocs.io/en/master/guide/custom_env.html
+
+
 
 
 

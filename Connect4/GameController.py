@@ -78,7 +78,7 @@ class GameController:
 
 	def next_turn(self):
 		self.turn += 1
-		self.ui.print_player_screen((self.turn % 2)+1, 0)
+		self.ui.print_player_screen((self.turn % 2)+1, 3)
 
 	def reestart_game(self):
 		initial_board = np.array([  [0,0,0,0,0,0,0],
