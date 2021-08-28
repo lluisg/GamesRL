@@ -103,7 +103,8 @@ class UIBoard:
         self.game.display.update()
 
 
-
+    def new_piece(self, row, col):
+        PRINT THE NEW PIECES GETTING BIGGER
 
 
 

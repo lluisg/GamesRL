@@ -29,15 +29,25 @@ class GameController:
 
 	def play(self):
 		running = True
-		self.ui.print_board_values()
+		# self.ui.print_board_values()
 
-		initial_board = np.array([  [0,  2,  4,   8],
-									[16, 32, 64,  128],
-									[256,512,1024,2048],
-									[0,  0,  0,   0]])
+		# initial_board = np.array([  [0,  2,  4,   8],
+		# 							[16, 32, 64,  128],
+		# 							[256,512,1024,2048],
+		# 							[0,  0,  0,   0]])
+		# initial_board = np.array([  [0,2,2,0],
+		# 							[2,0,0,2],
+		# 							[2,4,4,4],
+		# 							[16,0,16,8]])
+		# self.b_controller.set_board(initial_board)
+		# self.ui.print_board_values()
 
-		self.b_controller.set_board(initial_board)
+		self.b_controller.reestart_board()
 		self.ui.print_board_values()
+		for _ in range(2):
+			r, c = self.b_controller.appear_piece()
+			self.ui.new_piece(r, c)
+
 		moves = 0
 		start = pygame.time.get_ticks()
 		while running:
@@ -45,10 +55,18 @@ class GameController:
 				time_playing = self.ticks2time(now - start)
 				self.ui.print_base_screen(time_playing, moves)
 				moving = self.player.move()
-				if moving != None:
+				if moving == True:
+					print('next move')
 					moves += 1
-					if moving == False:
+					self.ui.print_board_values()
+					r, c = self.b_controller.appear_piece()
+					self.ui.new_piece(r, c)
+					if self.b_controller.no_moves():
+						print('NO MORE MOVES')
 						running = False
+				elif moving == False:
+					running = False
+
 
 	def ticks2time(self, ticks):
 		seconds = int((ticks/1000) % 60)

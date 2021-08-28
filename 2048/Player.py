@@ -24,13 +24,25 @@ class Player:
 				if event.key == K_ESCAPE:
 					return False
 				elif event.key == K_LEFT:
-					return True
+					movements = self.b_controller.move_left()
+					print('movements:', movements)
+					if movements > 0:
+						return True
 				elif event.key == K_RIGHT:
-					return True
+					movements = self.b_controller.move_right()
+					print('movements:', movements)
+					if movements > 0:
+						return True
 				elif event.key == K_UP:
-					return True
+					movements = self.b_controller.move_up()
+					print('movements:', movements)
+					if movements > 0:
+						return True
 				elif event.key == K_DOWN:
-					return True
+					movements = self.b_controller.move_down()
+					print('movements:', movements)
+					if movements > 0:
+						return True
 			elif event.type == self.game.QUIT:
 				return False
 		return None
