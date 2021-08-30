@@ -14,9 +14,13 @@ class UIBoard:
         self.small_width = self.width * 14/16
         self.small_height = self.height * 14/16
 
+        self.time = '0:00'
+        self.moves = 0
+
         self.game = pygame
         self.screen = screen
         self.font_numbers = self.game.font.Font(None, 60)
+        self.font_text = self.game.font.Font(None, 60)
         self.font_info = self.game.font.Font(None, 24)
         self.font_score = self.game.font.Font(None, 24)
 
@@ -34,6 +38,8 @@ class UIBoard:
         self.YELLOW3 = (237, 204, 97)
         self.YELLOW4 = (237, 197, 63)
         self.YELLOW5 = (238, 194, 46)
+        self.BLUE = (0, 0, 255)
+        self.GREEN = (0, 128, 0)
 
         self.values2colorsPiece = {	0: self.GRAY3,      2: self.GRAY2,      4: self.GRAY2,
                                     8: self.ORANGE,     16: self.ORANGE2,   32: self.RED,
@@ -44,13 +50,17 @@ class UIBoard:
                                     64: self.WHITE,     128: self.WHITE,    256: self.WHITE,
                                     512: self.WHITE,    1024: self.WHITE,   2048: self.WHITE }
 
+    def set_time_moves(self, t, m):
+        self.time = t
+        self.moves = m
+
     def print_board_values(self):
 
-        b_values = self.b_controller.get_board()
+        b_values = self.b_controller.get_board_values()
         print(np.matrix(b_values))
 
-    def print_base_screen(self, time, moves):
-        board = self.b_controller.get_board()
+    def print_base_screen(self):
+        board = self.b_controller.get_board_values()
 
         self.screen.fill(self.WHITE)
         white_borderx = self.width*1/16
@@ -87,14 +97,14 @@ class UIBoard:
         self.screen.blit(text_score, textRect)
 
         #time
-        text_score = self.font_score.render(time, 0, self.GRAY)
+        text_score = self.font_score.render(self.time, 0, self.GRAY)
         textRect = text_score.get_rect()
         textRect.left = self.width - white_borderx*2
         textRect.centery = self.height - white_bordery/2
         self.screen.blit(text_score, textRect)
 
         #moves
-        text_score = self.font_score.render("{} moves".format(moves), 0, self.GRAY)
+        text_score = self.font_score.render("{} moves".format(self.moves), 0, self.GRAY)
         textRect = text_score.get_rect()
         textRect.x = white_borderx
         textRect.centery = self.height - white_bordery/2
@@ -104,104 +114,83 @@ class UIBoard:
 
 
     def new_piece(self, row, col):
-        PRINT THE NEW PIECES GETTING BIGGER
+        self.print_base_screen()
+
+        value_p = self.b_controller.get_board().get_piece(row, col).get_value()
 
 
+        white_borderx = self.width*1/16
+        white_bordery = self.height*1/16
+        miniborderx = 1/32*self.small_width
+        minibordery = 1/32*self.small_height
+        rectanglex = self.small_width*(32-5)/32 / self.cols
+        rectangley = self.small_height*(32-5)/32 / self.rows
+
+        x_pos =  white_borderx + (col+1) * miniborderx + col * rectanglex
+        y_pos =  white_bordery + (row+1) * minibordery + row * rectangley
+
+        rect_full = self.game.Rect(x_pos, y_pos, rectanglex, rectangley)
+        rr = self.game.draw.rect(self.screen, self.values2colorsPiece[0], rect_full, border_radius=3)
+
+        divisions = 20
+        ms2wait = 5
+        for i in range(divisions):
+            rect_grow = self.game.Rect(x_pos, y_pos, rectanglex*i/divisions, rectangley*i/divisions)
+            rect_grow.center = rect_full.center
+
+            rr = self.game.draw.rect(self.screen, self.values2colorsPiece[value_p], rect_grow, border_radius=3)
+            self.game.display.update()
+
+            self.game.time.wait(ms2wait)
 
 
+    def print_ending(self, text, color_text):
+        self.print_base_screen()
+        center_screen_x = self.width / 2
+        center_screen_y = self.height / 2
 
+        self.game.draw.rect(self.screen, self.WHITE,
+                            (self.width / 4 - 1, self.height * 3 / 8 - 1, self.width / 2 + 2, self.height / 4 + 2))
+        self.game.draw.rect(self.screen, self.BLACK,
+                            (self.width / 4, self.height * 3 / 8, self.width / 2, self.height / 4))
 
-    #
-    # def print_player_screen(self, player, column):
-    #     self.print_base_screen()
-    #     row = 0
-    #
-    #     x_pos = self.width / self.cols / 2 + column * self.width / self.cols
-    #     y_pos = self.height / (self.rows + 1) / 2 + \
-    #         row * self.height / (self.rows + 1)
-    #     self.game.draw.circle(self.screen, self.indices_colors[player], (x_pos, y_pos), min(
-    #         self.width / self.cols, self.height / (self.rows + 1)) / 2)
-    #
-    #     self.game.display.update(self.RECT_upperscreen)
-    #
-    # def print_drop_piece(self, player, column):
-    #
-    #     row = self.b_controller.get_available_row(column)
-    #     x_pos = self.width / self.cols / 2 + column * self.width / self.cols
-    #     self.RECT_columnscreen = self.game.Rect(
-    #         column * self.width / self.cols, 0, self.width / self.cols, self.height)  # only update the column necesary
-    #
-    #     for r in range(1, row + 2):
-    #         self.game.time.delay(50)  # 1s each
-    #         y_pos = self.height / (self.rows + 1) / 2 + \
-    #             r * self.height / (self.rows + 1)
-    #
-    #         self.print_base_screen()
-    #         self.game.draw.circle(self.screen, self.indices_colors[player], (x_pos, y_pos), min(
-    #             self.width / self.cols, self.height / (self.rows + 1)) / 2)
-    #         self.game.display.update(self.RECT_columnscreen)
-    #
-    # def print_wrongdrop(self, player, column):
-    #     self.print_base_screen()
-    #     row = 0
-    #
-    #     x_pos = self.width / self.cols / 2 + column * self.width / self.cols
-    #     y_pos = self.height / (self.rows + 1) / 2 + \
-    #         row * self.height / (self.rows + 1)
-    #     self.game.draw.circle(self.screen, self.BLUE, (x_pos, y_pos), min(
-    #         self.width / self.cols, self.height / (self.rows + 1)) / 2)
-    #
-    #     self.game.display.update(self.RECT_upperscreen)
-    #     self.game.time.wait(100)
-    #     self.print_player_screen(player, column)
-    #
-    # def print_ending(self, text, color_text):
-    #     self.print_base_screen()
-    #     center_screen_x = self.width / 2
-    #     center_screen_y = self.height / 2
-    #
-    #     self.game.draw.rect(self.screen, self.WHITE,
-    #                         (self.width / 4 - 1, self.height * 3 / 8 - 1, self.width / 2 + 2, self.height / 4 + 2))
-    #     self.game.draw.rect(self.screen, self.BLACK,
-    #                         (self.width / 4, self.height * 3 / 8, self.width / 2, self.height / 4))
-    #
-    #     text_o = self.textOutline(self.font, text, color_text, self.WHITE)
-    #
-    #     textRect = text_o.get_rect()
-    #     textRect.center = (self.width / 2, self.height / 2)
-    #     self.screen.blit(text_o, textRect)
-    #     self.game.display.update()
-    #
-    # def print_winner(self, player):
-    #     text = 'PLAYER {} WINS!!'.format(player)
-    #     self.print_ending(text, self.indices_colors[player])
-    #
-    # def print_draw(self):
-    #     text = 'DRAW ...'
-    #     self.print_ending(text, self.BLUE)
-    #
-    # def textOutline(self, font, message, fontcolor, outlinecolor):
-    #     base = font.render(message, 0, fontcolor)
-    #     outline = self.textHollow(font, message, outlinecolor)
-    #     img = self.game.Surface(outline.get_size(), 16)
-    #     img.blit(base, (1, 1))
-    #     img.blit(outline, (0, 0))
-    #     img.set_colorkey(0)
-    #     return img
-    #
-    # def textHollow(self, font, message, fontcolor):
-    #     notcolor = [c ^ 0xFF for c in fontcolor]
-    #     base = font.render(message, 0, fontcolor, notcolor)
-    #     size = base.get_width() + 2, base.get_height() + 2
-    #     img = self.game.Surface(size, 16)
-    #     img.fill(notcolor)
-    #     base.set_colorkey(0)
-    #     img.blit(base, (0, 0))
-    #     img.blit(base, (2, 0))
-    #     img.blit(base, (0, 2))
-    #     img.blit(base, (2, 2))
-    #     base.set_colorkey(0)
-    #     base.set_palette_at(1, notcolor)
-    #     img.blit(base, (1, 1))
-    #     img.set_colorkey(notcolor)
-    #     return img
+        text_o = self.textOutline(self.font_text, text, color_text, self.WHITE)
+
+        textRect = text_o.get_rect()
+        textRect.center = (self.width / 2, self.height / 2)
+        self.screen.blit(text_o, textRect)
+        self.game.display.update()
+
+    def print_win(self):
+        text = 'YOU WIN !!'
+        self.print_ending(text, self.GREEN)
+
+    def print_loss(self):
+        text = 'YOU LOSE ...'
+        self.print_ending(text, self.BLUE)
+
+    def textOutline(self, font, message, fontcolor, outlinecolor):
+        base = font.render(message, 0, fontcolor)
+        outline = self.textHollow(font, message, outlinecolor)
+        img = self.game.Surface(outline.get_size(), 16)
+        img.blit(base, (1, 1))
+        img.blit(outline, (0, 0))
+        img.set_colorkey(0)
+        return img
+
+    def textHollow(self, font, message, fontcolor):
+        notcolor = [c ^ 0xFF for c in fontcolor]
+        base = font.render(message, 0, fontcolor, notcolor)
+        size = base.get_width() + 2, base.get_height() + 2
+        img = self.game.Surface(size, 16)
+        img.fill(notcolor)
+        base.set_colorkey(0)
+        img.blit(base, (0, 0))
+        img.blit(base, (2, 0))
+        img.blit(base, (0, 2))
+        img.blit(base, (2, 2))
+        base.set_colorkey(0)
+        base.set_palette_at(1, notcolor)
+        img.blit(base, (1, 1))
+        img.set_colorkey(notcolor)
+        return img

@@ -1,151 +1,99 @@
+from CustomEnv import Game2048Env
+
 import numpy as np
-# import pygame
-import sys
-import math
+import matplotlib.pyplot as plt
+print(1)
+from stable_baselines import DQN, PPO2, A2C, ACKTR
+from stable_baselines.common.evaluation import evaluate_policy
+from stable_baselines.common.cmd_util import make_vec_env
 
-from BoardController import BoardController
-from Player import Player
-from UIBoard import UIBoard
+scores = []
+better_result = {
+	'score' : 0,
+	'value' : 0,
+	'list_moves' : [],
+	'list_states' : [],
+	'finished' : False,
+	'episode': -1
+}
 
-import pygame
-from pygame.locals import *
-pygame.init()
+print(2)
+env = Game2048Env(4, 4)
 
-class GameController:
-	def __init__(self):
-		self.rows = 4
-		self.columns = 4
-		self.area = (600, 600)
+# wrap the env
+env = make_vec_env(lambda: env, n_envs=1)
 
-		self.screen = pygame.display.set_mode(self.area)
-		pygame.display.set_caption('2048')
-		self.clock = pygame.time.Clock()
-		self.clock.tick(30) # 60 FPS
+model = DQN('MlpPolicy', env, learning_rate=1e-3, prioritized_replay=True, verbose=1)
+# model = ACKTR('MlpPolicy', env, verbose=1).learn(5000)
+model = model.learn(100)
 
-		self.b_controller = BoardController(self.rows, self.columns)
-		self.ui = UIBoard(self.b_controller, self.area, pygame, self.screen)
-		self.player = Player(self.b_controller, pygame, self.ui)
-
-
-	def play(self):
-		running = True
-		# self.ui.print_board_values()
-
-		# initial_board = np.array([  [0,  2,  4,   8],
-		# 							[16, 32, 64,  128],
-		# 							[256,512,1024,2048],
-		# 							[0,  0,  0,   0]])
-		# initial_board = np.array([  [0,2,2,0],
-		# 							[2,0,0,2],
-		# 							[2,4,4,4],
-		# 							[16,0,16,8]])
-		# self.b_controller.set_board(initial_board)
-		# self.ui.print_board_values()
-
-		self.b_controller.reestart_board()
-		self.ui.print_board_values()
-		for _ in range(2):
-			r, c = self.b_controller.appear_piece()
-			self.ui.new_piece(r, c)
-
-		moves = 0
-		start = pygame.time.get_ticks()
-		while running:
-				now = pygame.time.get_ticks()
-				time_playing = self.ticks2time(now - start)
-				self.ui.print_base_screen(time_playing, moves)
-				moving = self.player.move()
-				if moving == True:
-					print('next move')
-					moves += 1
-					self.ui.print_board_values()
-					r, c = self.b_controller.appear_piece()
-					self.ui.new_piece(r, c)
-					if self.b_controller.no_moves():
-						print('NO MORE MOVES')
-						running = False
-				elif moving == False:
-					running = False
+# Test the trained agent
+obs = env.reset()
+n_steps = 1000
+for step in range(n_steps):
+  action, _ = model.predict(obs, deterministic=True)
+  print("Step {}".format(step + 1))
+  print("Action: ", action)
+  obs, reward, done, info = env.step(action)
+  print('obs=', obs, 'reward=', reward, 'done=', done)
+  env.render('terminal')
+  if done:
+    # Note that the VecEnv resets automatically
+    # when a done signal is encountered
+    print("Goal reached!", "reward=", reward)
+    break
 
 
-	def ticks2time(self, ticks):
-		seconds = int((ticks/1000) % 60)
-		minutes = int((ticks/(1000*60)) % 60)
-		hours = int((ticks/(1000*60*60)) % 24)
 
-		if hours > 0:
-			return "{}:{}:{:02d}".format(hours, minutes, seconds)
-		else:
-			return "{}:{:02d}".format(minutes, seconds)
-
-
-	# 	self.reestart_game()
-	# 	running = True
-	# 	ended = False
-	# 	while running:
-	#
-	# 		if ended:
-	# 			moving = self.player1.wait_to_reestart()
-	# 			if moving == False:
-	# 				running = False
-	#
-	# 			now = pygame.time.get_ticks()
-	# 			if now - start_wait >= self.cooldown:
-	# 				ended = False
-	# 				self.reestart_game()
-	# 				pygame.event.clear()
-	#
-	# 		else:
-	# 			if (self.turn % 2)+1 == 1: #instead of [01] we use [12]
-	# 				moving = self.player1.move()
-	# 			else:
-	# 				moving = self.player2.move()
-	#
-	# 			if moving == True:
-	# 				self.ui.print_board_values(False)
-	# 				print('ended turn player {}\n'.format((self.turn % 2)+1))
-	# 				winner = self.b_controller.check_winner((self.turn % 2)+1)
-	# 				draw = self.b_controller.check_draw()
-	# 				if winner:
-	# 					print("\nPLAYER {} WINS !!".format(winner))
-	# 					self.ui.print_winner((self.turn % 2)+1)
-	# 					start_wait = pygame.time.get_ticks()
-	# 					ended = True
-	# 				elif draw:
-	# 					print("\nDRAW...".format(winner))
-	# 					self.ui.print_draw()
-	# 					start_wait = pygame.time.get_ticks()
-	# 					ended = True
-	# 				else:
-	# 					self.next_turn()
-	# 			elif moving == False:
-	# 				running = moving
-	#
-	# 	pygame.quit()
-	#
-	# def next_turn(self):
-	# 	self.turn += 1
-	# 	self.ui.print_player_screen((self.turn % 2)+1, 3)
-	#
-	# def reestart_game(self):
-	# 	initial_board = np.array([  [0,0,0,0,0,0,0],
-	# 								[0,0,0,0,0,0,0],
-	# 								[0,0,0,0,0,0,0],
-	# 								[0,0,0,0,0,0,0],
-	# 								[0,0,0,0,0,0,0],
-	# 								[0,0,0,0,0,0,0] ])
-	#
-	# 	initial_board = np.array([  [0,0,0,0,0,0,0],
-	# 								[0,0,0,0,0,0,0],
-	# 								[0,0,0,0,0,0,0],
-	# 								[0,0,0,0,0,0,0],
-	# 								[0,2,2,2,0,0,0],
-	# 								[0,1,1,1,0,0,0] ])
-	#
-	# 	self.b_controller.set_board(initial_board)
-	# 	self.turn = -1
-	# 	self.next_turn()
-
-
-c = GameController()
-c.play()
+# episodes = 5
+# for i_episode in range(episodes):
+# 	observation = env.reset()
+# 	for t in range(1000):
+# 		env.render()
+# 		action, _ = model.predict(observation, deterministic=True)
+# 		# action = env.action_space.sample()
+# 		observation, reward, done, info = env.step(action)
+#
+# 		if done:
+# 			print("Episode {} finished after {} movements with score = {} and maximum value = {}".format(i_episode, t+1, reward, info['max_v']))
+# 			scores.append(reward)
+#
+# 			if reward > better_result['score']:
+#
+# 				if info['max_v'] == 2048:
+# 					better_result['finished'] = True
+# 				else:
+# 					better_result['finished'] = False
+#
+# 				better_result['score'] = reward
+# 				better_result['value'] = info['max_v']
+# 				better_result['list_moves'] = info['list_moves']
+# 				better_result['list_states'] = info['list_states']
+# 				better_result['episode'] = i_episode
+#
+# 			break
+# env.close()
+#
+# print()
+# if better_result['finished'] == True:
+# 	print("Episode {} finished the game!!".format(better_result['episode']))
+# else:
+# 	print("No episode finished the game...")
+# 	print("Max score = {} and Max value = {} on Episode {}".format(better_result['score'], better_result['value'], better_result['episode']))
+#
+# episodes_ind = [x for x in range(episodes)]
+#
+# plt.axis((0, episodes, 0, better_result['score']))
+# plt.plot(episodes_ind, scores, 'k', label='scores')
+# plt.legend(loc="upper right")
+# plt.show()
+#
+#
+# # at the end show the same steps the model did on the best try
+# print('e')
+# env = Game2048Env(4, 4, True)
+# for state in better_result['list_states']:
+# 	env.set_specific_table(state)
+# 	# env.print()
+# 	env.render('human')
+# env.close()

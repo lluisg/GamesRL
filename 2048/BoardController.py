@@ -23,8 +23,11 @@ class BoardController:
 			for ind_c, c in enumerate(r):
 				self.board.put_piece(ind_r, ind_c, Piece(c))
 
-	def get_board(self):
+	def get_board_values(self):
 		return self.board.get_board_values()
+
+	def get_board(self):
+		return self.board
 
 	def get_score(self):
 		b = self.board.get_board_values()
@@ -34,6 +37,16 @@ class BoardController:
 			for c in r:
 				sum += c
 		return sum
+
+	def get_max_value(self):
+		b = self.board.get_board_values()
+
+		max = 0
+		for r in b:
+			for c in r:
+				if c > max:
+					max = c
+		return max
 
 	def appear_piece(self):
 		empty_r, empty_c = self.board.get_empty_pos()
@@ -55,13 +68,31 @@ class BoardController:
 			for c in range(self.cols):
 				self.board.put_piece(r, c, Piece())
 
-	def no_moves(self):
-		#FOR NOW ONLY CHECKS IF FULL, LATER CHECK MOVEMENTS
+	def check_nomoves(self):
 		for r in range(self.rows):
 			for c in range(self.cols):
-				if self.board.get_piece(r, c).get_value() == 0:
+				value = self.board.get_piece(r, c).get_value()
+				if value == 0:
 					return False
+
+				if r != 0:
+					value_up = self.board.get_piece(r-1, c).get_value()
+					if value_up == value:
+						return False
+				if c != 0:
+					value_left = self.board.get_piece(r, c-1).get_value()
+					if value_left == value:
+						return False
 		return True
+
+	def check_winner(self):
+		b = self.get_board_values()
+		for r in b:
+			for c in r:
+				if c == 2048:
+					return True
+		return False
+
 
 	def move_left(self):
 		movements = 0
@@ -171,7 +202,7 @@ class BoardController:
 								if piece_r == self.cols-1:
 									break
 
-							if merged_col == False and piece_c != self.cols-1:
+							if merged_col == False and piece_r != self.cols-1:
 								if self.can_be_merged(piece_r+1, c, piece_r, c):
 									self.board.merge_pieces(piece_r+1, c, piece_r, c)
 									merged_col = True
@@ -189,130 +220,3 @@ class BoardController:
 		if val1 == val2:
 			return True
 		return False
-
-	# def drop_piece(self, col, player):
-	# 	if self.valid_position(col):
-	# 		row = self.get_available_row(col)
-	# 		if player == 1:
-	# 			self.board.put_piece(row, col, Piece.RED)
-	# 		elif player == 2:
-	# 			self.board.put_piece(row, col, Piece.YELLOW)
-	#
-	#
-	# def valid_position(self, col):
-	# 	bp = self.board.get_position(0, col)
-	# 	if bp.get_piece_color() == Piece.BLACK.value:
-	# 		return True
-	# 	else:
-	# 		return False
-	#
-	# def get_available_row(self, col):
-	# 	for r in range(self.rows-1, -1, -1):
-	# 		bp = self.board.get_position(r, col)
-	# 		if bp.get_piece_color() == Piece.BLACK.value:
-	# 			return r
-	#
-	# def check_draw(self):
-	# 	board_values = self.board.get_board_values()
-	# 	for c in range(self.cols):
-	# 		col_used = self.valid_position(c)
-	# 		if col_used == True:
-	# 			return False
-	# 	return True
-	#
-	#
-	# def check_winner(self, last_move):
-	#
-	# 	for ind_r, r in enumerate(self.board.get_board_values()):
-	# 		for ind_c, c in enumerate(r):
-	# 			if self.board.get_position(ind_r, ind_c).get_piece_color() == last_move:
-	#
-	# 				if self.check_horizontal(ind_r, ind_c, last_move) or \
-	# 					self.check_vertical(ind_r, ind_c, last_move) or \
-	# 					self.check_diagonal(ind_r, ind_c, last_move):
-	# 						return last_move
-	# 	return False
-	#
-	# def check_horizontal(self, row, col, color):
-	# 	last_piece = Piece.BLACK
-	# 	inline = 0
-	# 	for i in range(-3, 4, 1):
-	# 		# print('\ncoord:', row, col, i, col+i)
-	# 		# print(i < 0, col + i >= 0, i >= 0, col + i < self.cols)
-	# 		if (i < 0 and col + i >= 0) or (i >= 0 and col + i < self.cols):
-	# 			p = self.board.get_position(row, col+i).get_piece()
-	# 			# print('last piece', last_piece, p, p==last_piece)
-	# 			if last_piece != p:
-	# 				last_piece = p
-	# 				inline = 0
-	#
-	# 			# print('value color', p.value, color, p.value == color)
-	# 			if p.value == color:
-	# 				inline += 1
-	#
-	# 			# print('inline', inline)
-	# 			if inline >= 4:
-	# 				# print('horiz')
-	# 				return True
-	#
-	# 	return False
-	#
-	# def check_vertical(self, row, col, color):
-	# 	last_piece = Piece.BLACK
-	# 	inline = 0
-	# 	for i in range(-3, 4, 1):
-	# 		if (i < 0 and row + i >= 0) or (i >= 0 and row + i < self.rows):
-	# 			p = self.board.get_position(row+i, col).get_piece()
-	# 			if last_piece != p:
-	# 				last_piece = p
-	# 				inline = 0
-	#
-	# 			if p.value == color:
-	# 				inline += 1
-	#
-	# 			if inline >= 4:
-	# 				# print('vert')
-	# 				return True
-	#
-	# 	return False
-	#
-	# def check_diagonal(self, row, col, color):
-	# 	# 1 down right
-	# 	last_piece = Piece.BLACK
-	# 	inline = 0
-	# 	for i in range(-3, 4, 1):
-	# 		if ((i < 0 and row + i >= 0) or (i >= 0 and row + i < self.rows)) and \
-	# 		((i < 0 and col + i >= 0) or (i >= 0 and col + i < self.cols)):
-	#
-	# 			p = self.board.get_position(row+i, col+i).get_piece()
-	# 			if last_piece != p:
-	# 				last_piece = p
-	# 				inline = 0
-	#
-	# 			if p.value == color:
-	# 				inline += 1
-	#
-	# 			if inline >= 4:
-	# 				# print('diag dr')
-	# 				return True
-	#
-	# 	# 2 down left
-	# 	last_piece = Piece.BLACK
-	# 	inline = 0
-	# 	for i in range(-3, 4, 1):
-	# 		if ((i < 0 and row + i >= 0) or (i >= 0 and row + i < self.rows)) and \
-	# 		((i > 0 and col - i >= 0) or (i <= 0 and col - i < self.cols)):
-	#
-	# 			p = self.board.get_position(row+i, col-i).get_piece()
-	# 			if last_piece != p:
-	# 				last_piece = p
-	# 				inline = 0
-	#
-	# 			if p.value == color:
-	# 				inline += 1
-	#
-	# 			if inline >= 4:
-	# 				# print('diag dl')
-	# 				return True
-	#
-	# 	return False
