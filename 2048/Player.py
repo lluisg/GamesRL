@@ -24,23 +24,23 @@ class Player:
                 if event.key == K_ESCAPE:
                     return False
                 elif event.key == K_LEFT:
-                    movements = self.b_controller.move_left()
-                    print('movements:', movements)
+                    movements, merged = self.b_controller.move_left()
+                    print('movements: {}, reward: {}'.format(movements, merged))
                     if movements > 0:
                         return True
                 elif event.key == K_RIGHT:
-                    movements = self.b_controller.move_right()
-                    print('movements:', movements)
+                    movements, merged = self.b_controller.move_right()
+                    print('movements: {}, reward: {}'.format(movements, merged))
                     if movements > 0:
                         return True
                 elif event.key == K_UP:
-                    movements = self.b_controller.move_up()
-                    print('movements:', movements)
+                    movements, merged = self.b_controller.move_up()
+                    print('movements: {}, reward: {}'.format(movements, merged))
                     if movements > 0:
                         return True
                 elif event.key == K_DOWN:
-                    movements = self.b_controller.move_down()
-                    print('movements:', movements)
+                    movements, merged = self.b_controller.move_down()
+                    print('movements: {}, reward: {}'.format(movements, merged))
                     if movements > 0:
                         return True
 

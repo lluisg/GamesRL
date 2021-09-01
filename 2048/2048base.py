@@ -2,10 +2,6 @@ from CustomEnv import Game2048Env
 
 import numpy as np
 import matplotlib.pyplot as plt
-# print(1)
-# from stable_baselines import DQN, PPO2, A2C, ACKTR
-# from stable_baselines.common.evaluation import evaluate_policy
-# from stable_baselines.common.cmd_util import make_vec_env
 
 scores = []
 better_result = {
@@ -17,41 +13,14 @@ better_result = {
 	'episode': -1
 }
 
-print(2)
-env = Game2048Env(4, 4. 3)
-
-# # wrap the env
-# env = make_vec_env(lambda: env, n_envs=1)
-#
-# model = DQN('MlpPolicy', env, learning_rate=1e-3, prioritized_replay=True, verbose=1)
-# # model = ACKTR('MlpPolicy', env, verbose=1).learn(5000)
-# model = model.learn(100)
-#
-# # Test the trained agent
-# obs = env.reset()
-# n_steps = 1000
-# for step in range(n_steps):
-#   action, _ = model.predict(obs, deterministic=True)
-#   print("Step {}".format(step + 1))
-#   print("Action: ", action)
-#   obs, reward, done, info = env.step(action)
-#   print('obs=', obs, 'reward=', reward, 'done=', done)
-#   env.render('terminal')
-#   if done:
-#     # Note that the VecEnv resets automatically
-#     # when a done signal is encountered
-#     print("Goal reached!", "reward=", reward)
-#     break
-
-
+env = Game2048Env(4, 4, 3)
 
 episodes = 5
 for i_episode in range(episodes):
 	observation = env.reset()
-	for t in range(1000):
+	for t in range(2000):
 		env.render()
-		action, _ = model.predict(observation, deterministic=True)
-		# action = env.action_space.sample()
+		action = env.action_space.sample()
 		observation, reward, done, info = env.step(action)
 
 		if done:

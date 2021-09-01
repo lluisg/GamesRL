@@ -64,3 +64,4 @@ class Board:
     def merge_pieces(self, row1, col1, row2, col2):
         self.board[row1][col1].value_upgrade()
         self.remove_piece(row2, col2)
+        return self.board[row1][col1].get_value()

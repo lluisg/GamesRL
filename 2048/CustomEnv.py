@@ -20,7 +20,7 @@ class Game2048Env(gym.Env):
 	UP = 2
 	DOWN = 3
 
-	def __init__(self, rows, cols, showing=False):
+	def __init__(self, rows, cols, reward, showing=False):
 		super(Game2048Env, self).__init__()
 		pygame.init()
 
@@ -60,6 +60,7 @@ class Game2048Env(gym.Env):
 		self.viewer = None
 		self.list_moves = []
 		self.list_states = []
+		self.type_reward = reward
 
 	def reset(self):
 		"""
@@ -86,18 +87,18 @@ class Game2048Env(gym.Env):
 		return flat_obs
 
 	def step(self, action):
-		movements = 0
+		MAX_MOVES = 1000
 		if action == self.LEFT:
-				movements = self.b_controller.move_left()
+				movements, merged = self.b_controller.move_left()
 				self.list_moves.append('left')
 		elif action == self.RIGHT:
-				movements = self.b_controller.move_right()
+				movements, merged = self.b_controller.move_right()
 				self.list_moves.append('right')
 		elif action == self.UP:
-				movements = self.b_controller.move_up()
+				movements, merged = self.b_controller.move_up()
 				self.list_moves.append('up')
 		elif action == self.DOWN:
-				movements = self.b_controller.move_down()
+				movements, merged = self.b_controller.move_down()
 				self.list_moves.append('down')
 		else:
 			raise ValueError("Received invalid action={} which is not part of the action space".format(action))
@@ -113,31 +114,56 @@ class Game2048Env(gym.Env):
 			r, c = self.b_controller.appear_piece()
 			# self.ui.new_piece(r, c)
 
-		# Optionally we can pass additional info, we are not using that for now
-		info = {'finished':False, 'max_v':0, 'list_moves':self.list_moves, 'list_states':self.list_states}
-
 		self.moves += 1
 
-		# The reward will be the sum of values in screen - 1 per each move
-		# reward = self.b_controller.get_score() - 1*self.moves
-		# reward = self.b_controller.get_score()
-		# print('r1', self.b_controller.get_board_values())
-		reward = 0.1*self.b_controller.get_score() + self.b_controller.get_max_value()
-		if movements == 0:
-			reward = -100
-		# print('r2', self.b_controller.get_score(), self.b_controller.get_max_value(), reward)
+		# Optionally we can pass additional info, we are not using that for now
+		info = {'finished':False, 'max_v':0, 'list_moves':self.list_moves, 'list_states':self.list_states, 'stopped':'idk', 'step':self.moves}
 
-		# plus a multiplier per 2 finalizing the game, so we can try to maximize and reduce number of moves
-		# if the model can finish the game, the reward will be 5k, much better than any which is not finished
+		if self.type_reward == 1:
+			# REWARD: sum of values in screen - 1 per each move
+			# if finished the score multiplied by 2, to try to reduce moves
+			reward = self.b_controller.get_score() - 1*self.moves
+			if self.b_controller.check_winner():
+				reward *= 2
+		elif self.type_reward == 2:
+			# REWARD: sum of the maximum value on screen plus 1/10 of the sum of all the values
+			# if the move is invalid a negative reward, if finished 5k of reward
+			reward = 0.1*self.b_controller.get_score() + self.b_controller.get_max_value()
+			if movements == 0:
+				reward = -100
+			if self.b_controller.check_winner():
+				reward = 5000
+			# print('r1', self.b_controller.get_board_values())
+			# print('r2', self.b_controller.get_score(), self.b_controller.get_max_value(), reward)
+		elif self.type_reward == 3:
+			# REWARD: the value of the new merged values
+			reward = merged
+		elif self.type_reward == 4:
+			# REWARD: the value of the new merged values
+			reward = merged
+			if movements == 0:
+				reward = -100
+			else:
+				reward += 1
+
 		done = False
+		# print(self.moves, self.b_controller.check_winner(), self.b_controller.check_nomoves())
 		if self.b_controller.check_winner():
-			reward = 5000
 			info['finished'] = True
-			info['max_v'] = self.b_controller.get_max_value()
+			info['stopped'] = 'Winner'
 			done = True
 		if self.b_controller.check_nomoves():
-			info['max_v'] = self.b_controller.get_max_value()
+			info['stopped'] = 'No moves'
 			done = True
+		if self.moves >= MAX_MOVES:
+			info['stopped'] = 'Max moves'
+			done = True
+		if movements == 0:
+			info['stopped'] = 'Ilegal move'
+			done = True
+
+		if done == True:
+			info['max_v'] = self.b_controller.get_max_value()
 
 		obs = np.array(self.b_controller.get_board_values())
 		flat_obs = obs.flatten(order='C')

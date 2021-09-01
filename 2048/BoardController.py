@@ -96,6 +96,7 @@ class BoardController:
 
 	def move_left(self):
 		movements = 0
+		merged_values = 0
 		try:
 			for r in range(self.rows):
 				merged_row = False
@@ -120,10 +121,12 @@ class BoardController:
 
 								if self.can_be_merged(r, piece_c-1, r, piece_c):
 									# print('merged')
-									self.board.merge_pieces(r, piece_c-1, r, piece_c)
+									m_value = self.board.merge_pieces(r, piece_c-1, r, piece_c)
 									merged_row = True
 									movements += 1
-			return movements
+									merged_values += m_value
+
+			return movements, merged_values
 
 		except ValueError as ve:
 			print(str(ve))
@@ -131,6 +134,7 @@ class BoardController:
 
 	def move_right(self):
 		movements = 0
+		merged_values = 0
 		try:
 			for r in range(self.rows):
 				merged_row = 0
@@ -148,10 +152,12 @@ class BoardController:
 
 							if merged_row == False and piece_c != self.cols-1:
 								if self.can_be_merged(r, piece_c+1, r, piece_c):
-									self.board.merge_pieces(r, piece_c+1, r, piece_c)
+									m_value = self.board.merge_pieces(r, piece_c+1, r, piece_c)
 									merged_row = True
 									movements += 1
-			return movements
+									merged_values += m_value
+
+			return movements, merged_values
 
 		except ValueError as ve:
 			print(str(ve))
@@ -159,6 +165,7 @@ class BoardController:
 
 	def move_up(self):
 		movements = 0
+		merged_values = 0
 		try:
 			for c in range(self.cols):
 				merged_col = 0
@@ -176,10 +183,12 @@ class BoardController:
 
 							if merged_col == False and piece_r != 0:
 								if self.can_be_merged(piece_r-1, c, piece_r, c):
-									self.board.merge_pieces(piece_r-1, c, piece_r, c)
-									merged_col = True
+									m_value = self.board.merge_pieces(piece_r-1, c, piece_r, c)
+									merged_row = True
 									movements += 1
-			return movements
+									merged_values += m_value
+
+			return movements, merged_values
 
 		except ValueError as ve:
 			print(str(ve))
@@ -187,6 +196,7 @@ class BoardController:
 
 	def move_down(self):
 		movements = 0
+		merged_values = 0
 		try:
 			for c in range(self.cols):
 				merged_col = 0
@@ -204,10 +214,12 @@ class BoardController:
 
 							if merged_col == False and piece_r != self.cols-1:
 								if self.can_be_merged(piece_r+1, c, piece_r, c):
-									self.board.merge_pieces(piece_r+1, c, piece_r, c)
-									merged_col = True
+									m_value = self.board.merge_pieces(piece_r+1, c, piece_r, c)
+									merged_row = True
 									movements += 1
-			return movements
+									merged_values += m_value
+
+			return movements, merged_values
 
 		except ValueError as ve:
 			print(str(ve))
