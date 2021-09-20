@@ -38,6 +38,10 @@ class BoardController:
 				sum += c
 		return sum
 
+	def get_score_position(self, x, y):
+		v = self.board.get_piece(x, y).get_value()
+		return v
+
 	def get_max_value(self):
 		b = self.board.get_board_values()
 
@@ -47,6 +51,19 @@ class BoardController:
 				if c > max:
 					max = c
 		return max
+
+	def get_max_value_position(self):
+		b = self.board.get_board_values()
+		x = 0
+		y = 0
+		max = 0
+		for indr, r in enumerate(b):
+			for indc, c in enumerate(r):
+				if c > max:
+					x = indc
+					y = indr
+					max = c
+		return x, y
 
 	def appear_piece(self):
 		empty_r, empty_c = self.board.get_empty_pos()
@@ -137,7 +154,7 @@ class BoardController:
 		merged_values = 0
 		try:
 			for r in range(self.rows):
-				merged_row = 0
+				merged_row = False
 				for c in range(self.cols-1, -1, -1):
 					if c != self.cols-1:
 						if self.board.get_piece(r, c).get_value() != 0:
@@ -168,7 +185,7 @@ class BoardController:
 		merged_values = 0
 		try:
 			for c in range(self.cols):
-				merged_col = 0
+				merged_col = False
 				for r in range(self.rows):
 					if r != 0:
 						if self.board.get_piece(r, c).get_value() != 0:
@@ -184,7 +201,7 @@ class BoardController:
 							if merged_col == False and piece_r != 0:
 								if self.can_be_merged(piece_r-1, c, piece_r, c):
 									m_value = self.board.merge_pieces(piece_r-1, c, piece_r, c)
-									merged_row = True
+									merged_col = True
 									movements += 1
 									merged_values += m_value
 
@@ -199,7 +216,7 @@ class BoardController:
 		merged_values = 0
 		try:
 			for c in range(self.cols):
-				merged_col = 0
+				merged_col = False
 				for r in range(self.rows-1, -1, -1):
 					if r != self.rows-1:
 						if self.board.get_piece(r, c).get_value() != 0:
@@ -215,7 +232,7 @@ class BoardController:
 							if merged_col == False and piece_r != self.cols-1:
 								if self.can_be_merged(piece_r+1, c, piece_r, c):
 									m_value = self.board.merge_pieces(piece_r+1, c, piece_r, c)
-									merged_row = True
+									merged_col = True
 									movements += 1
 									merged_values += m_value
 

@@ -2,6 +2,7 @@ from CustomEnv import Game2048Env
 
 import numpy as np
 import matplotlib.pyplot as plt
+import cv2
 
 scores = []
 better_result = {
@@ -13,13 +14,13 @@ better_result = {
 	'episode': -1
 }
 
-env = Game2048Env(4, 4, 3)
+env = Game2048Env(4, 4, 6, True)
 
-episodes = 5
+episodes = 1
 for i_episode in range(episodes):
 	observation = env.reset()
-	for t in range(2000):
-		env.render()
+	for t in range(1001):
+		env.render('terminal')
 		action = env.action_space.sample()
 		observation, reward, done, info = env.step(action)
 
@@ -43,26 +44,25 @@ for i_episode in range(episodes):
 			break
 env.close()
 
-# print()
-# if better_result['finished'] == True:
-# 	print("Episode {} finished the game!!".format(better_result['episode']))
-# else:
-# 	print("No episode finished the game...")
-# 	print("Max score = {} and Max value = {} on Episode {}".format(better_result['score'], better_result['value'], better_result['episode']))
+# observation = env.reset()
+# for t in range(1001):
+# 	env.render('video')
+# 	action = env.action_space.sample()
+# 	observation, reward, done, info = env.step(action)
 #
-# episodes_ind = [x for x in range(episodes)]
+# 	if done:
+# 		break
 #
-# plt.axis((0, episodes, 0, better_result['score']))
-# plt.plot(episodes_ind, scores, 'k', label='scores')
-# plt.legend(loc="upper right")
-# plt.show()
+# video_frames = env.get_video()
+# height, width, layers = video_frames[0].shape
+# size = (width,height)
+# out = cv2.VideoWriter(r"C:\Users\Lluis\Desktop\2048video.avi",cv2.VideoWriter_fourcc(*'DIVX'), 15, size)
 #
+# for i in range(len(video_frames)):
+#     out.write(video_frames[i])
+#     out.write(video_frames[i])
+#     out.write(video_frames[i])
+#     out.write(video_frames[i])
+# out.release()
 #
-# # at the end show the same steps the model did on the best try
-# print('e')
-# env = Game2048Env(4, 4, True)
-# for state in better_result['list_states']:
-# 	env.set_specific_table(state)
-# 	# env.print()
-# 	env.render('human')
 # env.close()
