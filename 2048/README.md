@@ -16,7 +16,9 @@ With PPOO better results are achieved. The rewards implemented are varied, some 
 The best results are achieved in the last case when more indications whether how the model should proceed are given. The model with the available time, learns to move right and left and sometimes up, which is not random movements and it starts to appear some strategy used by me when playing the game.
 
 The following graphs correspond to the training for 10.000 steps for epoch, 100 epochs and 300 games per evaluation step. The former is the mean value and the latter is the max value obtained.
+
 ![Mean Score Training](https://drive.google.com/uc?export=view&id=1svJYjKhq8N0WyCO4QSKEDmtPQqm-rZrH)
+
 ![Max Value Training](https://drive.google.com/uc?export=view&id=1cgBVA_ReIWS9eCYr7WbYtt_64-ZTG9KA)
 
 Additionally there is a link where you can see a video where it plays a game [Link To The Video](https://drive.google.com/file/d/18thnzPIuI_pKz1Rn2o_q0_SoELZUyXvt/view?usp=sharing).
