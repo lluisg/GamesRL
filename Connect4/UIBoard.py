@@ -26,6 +26,13 @@ class UIBoard:
 
         self.indices_colors = {	0: self.BLACK, 1: self.RED, 2: self.YELLOW	}
 
+        self.time = 0
+        self.moves = 0
+
+    def set_time_moves(self, t, m):
+        self.time = t
+        self.moves = m
+
     def print_board_values(self, indexs):
 
         b_values = self.b_controller.get_board()
@@ -51,6 +58,20 @@ class UIBoard:
 
                 self.game.draw.circle(self.screen, self.indices_colors[c], (x_pos, y_pos), min(
                     self.width / self.cols, self.height / (self.rows + 1)) / 2)
+
+        #time
+        text_score = self.font_score.render(self.time, 0, self.GRAY)
+        textRect = text_score.get_rect()
+        textRect.left = self.width - white_borderx*2
+        textRect.centery = self.height - white_bordery/2
+        self.screen.blit(text_score, textRect)
+
+        #moves
+        text_score = self.font_score.render("{} moves".format(self.moves), 0, self.GRAY)
+        textRect = text_score.get_rect()
+        textRect.x = white_borderx
+        textRect.centery = self.height - white_bordery/2
+        self.screen.blit(text_score, textRect)
 
         self.game.display.update()
 

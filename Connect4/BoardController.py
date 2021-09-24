@@ -11,6 +11,9 @@ class BoardController:
 	def __init__(self, rows, cols):
 		self.rows = rows
 		self.cols = cols
+		self.reestart_board()
+
+	def reestart_board(self):
 		self.board = Board(self.rows, self.cols)
 
 	def get_rowcols(self):
@@ -20,6 +23,9 @@ class BoardController:
 		self.board.set_specific_board(board)
 
 	def get_board(self):
+		return self.board
+
+	def get_board_values(self):
 		return self.board.get_board_values()
 
 	def drop_piece(self, col, player):

@@ -6,7 +6,7 @@ c = GameController()
 c.play()
 
 
-prepare player for DL
-DLModel
-CustomEnv
-train model (adding option to play vs human)
+# prepare player for DL
+# DLModel
+# CustomEnv
+# train model (adding option to play vs human)
