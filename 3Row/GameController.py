@@ -29,26 +29,26 @@ class Controller3Row:
 			self.turn = self.turn % 2 +1
 
 			if self.turn == 1:
-				print 'Turn', moves, ': player 1'
+				print('Turn', moves, ': player 1')
 				self.player1.play_turn()
 				winner = self.b_controller.check_winner(self.player1.get_number())
 			elif self.turn == 2:
-				print 'Turn', moves, ': player 2'
+				print('Turn', moves, ': player 2')
 				self.player2.play_turn()
 				winner = self.b_controller.check_winner(self.player2.get_number())
 
 			self.ui.print_board_values()
 			if winner:
 				if self.turn == 1:
-					print 'Player 1 won!!'
+					print('Player 1 won!!')
 				elif self.turn == 2:
-					print 'Player 2 won!!'
+					print('Player 2 won!!')
 				end = True
 			else:
 				draw = self.b_controller.check_nomoves()
 				if draw:
 					end = True
-					print 'Draw!!'
+					print('Draw!!')
 
 			moves += 1
 
@@ -69,4 +69,3 @@ class Controller3Row:
 		# 							[2,1,2],
 		# 							[1,2,0]])
 		self.b_controller.set_board(initial_board)
-

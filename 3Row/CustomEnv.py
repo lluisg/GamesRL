@@ -51,7 +51,6 @@ class Game3RowEnv(gym.Env):
 		move_row = int(action/3)
 		move_col = action % 3
 
-		done = False
 		validmove = self.b_controller.put_piece(move_row, move_col, self.player)
 
 		self.list_states.append(self.b_controller.get_board_values())
@@ -74,12 +73,15 @@ class Game3RowEnv(gym.Env):
 				if not loser: #if the rival hasn't won, check draw
 					draw = self.b_controller.check_nomoves()
 
-		if self.type_reward == 1:
+
+		done = False
+		if self.type_reward == 1 or self.type_reward == 2:
 			# REWARD: 1 if win, -1 if loss, 0 rest, if invalid move -10
 			if not validmove:
-				info['finished'] = 'invalid'
 				reward = -10
-				done = True
+				if self.type_reward == 1:
+					info['finished'] = 'invalid'
+					done = True
 			elif winner:
 				info['finished'] = 'win'
 				reward = 1
@@ -94,6 +96,11 @@ class Game3RowEnv(gym.Env):
 				done = True
 			else:
 				reward = 0
+
+			if self.type_reward == 2 and self.moves > 15:
+				info['finished'] = 'invalid'
+				done = True
+
 		else:
 			raise ValueError("Wrong reward value provided")
 
@@ -131,8 +138,7 @@ class Game3RowEnv(gym.Env):
 			self.ui.print_board_values()
 
 		elif mode == 'terminal':
-			b_values = self.b_controller.get_board_values()
-			print(np.matrix(b_values))
+			self.ui.print_board_values()
 
 		elif mode == 'colab':
 			IPython.display.clear_output()
@@ -151,13 +157,17 @@ class Game3RowEnv(gym.Env):
 
 	# for the vs player
 	def return_board(self):
-		return self.b_controller.get_board_values()
+		obs = np.array(self.b_controller.get_board_values())
+		flat_obs = obs.flatten(order='C')
+		return flat_obs
 
 	def player_move(self, position):
-		move_row = int(position / 3) - 1
-		move_col = (position % 3) - 1
-		invalidmove = self.b_controller.put_piece(move_row, move_col, self.rival)
-		return invalidmove
+		position -= 1
+		move_row = int(position / 3)
+		move_col = (position % 3)
+		print('move', move_row, move_col)
+		validmove = self.b_controller.put_piece(move_row, move_col, self.rival)
+		return validmove
 
 	def check_winner(self):
 		return self.b_controller.check_winner(self.rival)
