@@ -113,6 +113,8 @@ class Game3RowEnv(gym.Env):
 			pass
 		elif self.type_AI == 1:  # AI 1 = random AI
 			self.move_randomAI()
+		elif self.type_AI == 2:
+			self.move_defensiveAI() # AI 2 = random AI + avoid 3 in a row
 		else:
 			print('Incorrect type AI')
 
@@ -123,6 +125,13 @@ class Game3RowEnv(gym.Env):
 			rival_row = int(action_rival / 3) -1
 			rival_col = (action_rival % 3) -1
 			rivallvalidmove = self.b_controller.put_piece(rival_row, rival_col, self.rival)
+
+	def move_defensiveAI(self):
+		controller_check = copy.deepcopy(b_controller)
+
+		# if not critical:
+		# 	self.move_randomAI()
+
 
 	def get_video(self):
 		return self.video
